@@ -8,23 +8,109 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: black; color: #10b981; font-family: monospace; }
+        .terminal-input { background: transparent; border: none; outline: none; color: white; width: 100%; }
+    </style>
 </head>
-<body class="bg-black text-white">
+<body>
     <div id="root"></div>
+
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // --- HIER DEINEN CODE VON GITHUB (PENGUIN_ASCII bis Ende) EINFÜGEN ---
-        // WICHTIG: Entferne die "import"-Zeilen ganz oben, die brauchen wir hier nicht!
+        const PENGUIN_ASCII = `
+          .---.
+         /     \\
+        (  o o  )
+        |   V   |
+       / \\     / \\
+      (   '._.'   )
+       \\__/_\\__/
+         [===]
+        `;
 
-        function App() {
-            // Hier kommt der Rest deiner Logik rein...
+        const App = () => {
+            const [username, setUsername] = useState('');
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [history, setHistory] = useState([]);
+            const [inputValue, setInputValue] = useState('');
+            const [lives, setLives] = useState(3.0);
+            const [score, setScore] = useState(0);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (username.trim()) {
+                    setIsLoggedIn(true);
+                    setHistory([{
+                        type: 'system',
+                        content: `${PENGUIN_ASCII}\nWillkommen, ${username.toUpperCase()}.\nSystem bereit. Tippe '1' für Training.`
+                    }]);
+                }
+            };
+
+            const handleCommand = (e) => {
+                e.preventDefault();
+                const cmd = inputValue.trim().toLowerCase();
+                let response = "";
+
+                if (cmd === 'help' || cmd === 'hint') {
+                    setScore(prev => Math.max(0, prev - 50));
+                    response = "Herr Kernel: 'Ach, der feine Herr braucht Hilfe? Erbärmlich! ( -50 Punkte )'";
+                } else if (cmd === '1') {
+                    response = "Training gestartet: Wie lautet der Befehl zum Ändern von Rechten?";
+                } else {
+                    response = `Befehl '${cmd}' wird verarbeitet...`;
+                }
+
+                setHistory(prev => [...prev, { type: 'user', content: cmd }, { type: 'teacher', content: response }]);
+                setInputValue('');
+            };
+
+            if (!isLoggedIn) {
+                return (
+                    <div className="flex flex-col items-center justify-center h-screen">
+                        <pre className="text-emerald-500 mb-4">{PENGUIN_ASCII}</pre>
+                        <h1 className="text-xl mb-4 text-emerald-500">KERNEL_LOGIN_V3.2</h1>
+                        <form onSubmit={handleLogin} className="flex flex-col gap-2">
+                            <input 
+                                className="bg-zinc-900 border border-emerald-500 p-2 text-white"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Username"
+                            />
+                            <button className="bg-emerald-600 text-black font-bold p-2 hover:bg-emerald-400">LOGIN</button>
+                        </form>
+                    </div>
+                );
+            }
+
             return (
-                <div className="p-10 text-center">
-                    <h1 className="text-2xl text-emerald-500">Herr Kernel wird geladen...</h1>
+                <div className="p-4 max-w-2xl mx-auto h-screen flex flex-col">
+                    <div className="flex justify-between border-b border-emerald-900 pb-2 mb-4">
+                        <span>USER: {username}</span>
+                        <span>SCORE: {score}</span>
+                        <span>LIVES: {"❤️".repeat(Math.floor(lives))}</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto mb-4 text-sm whitespace-pre-wrap">
+                        {history.map((msg, i) => (
+                            <div key={i} className={msg.type === 'user' ? "text-blue-400" : "text-emerald-500"}>
+                                {msg.type === 'user' ? `> ${msg.content}` : msg.content}
+                            </div>
+                        ))}
+                    </div>
+                    <form onSubmit={handleCommand} className="flex border-t border-emerald-900 pt-2">
+                        <span className="mr-2">root@kernel:~#</span>
+                        <input 
+                            className="terminal-input"
+                            autoFocus
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                        />
+                    </form>
                 </div>
             );
-        }
+        };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
