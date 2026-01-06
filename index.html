@@ -62,22 +62,36 @@
             const handleCommand = (e) => {
                 e.preventDefault();
                 const cmd = inputValue.trim().toLowerCase();
-                let response = "Analysiere...";
+                let response = "";
+
+                // Know-how Datenbank für die Prüfung
+                const labs = [
+                    { q: "Wie änderst du Rechte auf '755'?", a: "chmod 755" },
+                    { q: "Befehl zum Stoppen eines Dienstes?", a: "systemctl stop" },
+                    { q: "Wie beendest du Prozess 1234 sofort?", a: "kill -9 1234" },
+                    { q: "Besitzer einer Datei auf 'admin' ändern?", a: "chown admin" },
+                    { q: "Wie hängst du Text an eine Logdatei an?", a: ">>" }
+                ];
 
                 if (cmd === '1') {
-                    response = "LAB START: Wie lautet der Befehl um Prozesse anzuzeigen? (Tipp: ps)";
-                } else if (cmd === 'ps') {
-                    setScore(s => s + 100);
-                    response = "[PASS] Korrekt! Prozesse werden gelistet.";
+                    // Wählt eine zufällige Prüfungsfrage aus
+                    const randomLab = labs[Math.floor(Math.random() * labs.length)];
+                    response = "PRÜFUNG: " + randomLab.q;
+                    window.currentAnswer = randomLab.a; // Merkt sich die Antwort kurzzeitig
+                } else if (window.currentAnswer && cmd.includes(window.currentAnswer)) {
+                    setScore(s => s + 200);
+                    response = "[PASS] Beeindruckend. Du hast das System verstanden.";
+                    window.currentAnswer = null;
                 } else if (cmd === 'help') {
                     setLives(l => l - 0.5);
-                    response = "[FAIL] Schwächling! Hilfe kostet 0.5 Leben.";
+                    response = "[FAIL] Hilfe? In der Prüfung bist du auf dich allein gestellt! (-0.5 Leben)";
+                } else {
+                    response = "Analysiere... Befehl nicht korrekt oder unbekannt. Versuch es erneut!";
                 }
 
                 setHistory(prev => [...prev, { type: 'user', content: cmd }, { type: 'teacher', content: response }]);
                 setInputValue('');
             };
-
             const hearts = "❤️".repeat(Math.floor(lives)) + (lives % 1 !== 0 ? "💔" : "");
 
             if (!isLoggedIn) {
