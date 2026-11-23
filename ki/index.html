@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kernel KI</title>
+  <meta name="description" content="Private KI direkt auf deinem Handy: Chat, Linux-Lehrer, Kamera und Sprache – offline, ohne Server.">
+  <meta name="theme-color" content="#06120d">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kernel KI">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="logo">▲</span> Kernel KI</div>
+    <button id="modelBadge" class="badge" data-goto="setup">KI: aus</button>
+  </header>
+
+  <main>
+    <!-- CHAT -->
+    <section id="view-chat" class="view active" aria-label="Chat">
+      <div class="toolbar">
+        <select id="persona" aria-label="Rolle der KI">
+          <option value="assistent">🤖 Assistent</option>
+          <option value="linux">🐧 Linux-Experte</option>
+          <option value="deutsch">📚 Deutschlehrer</option>
+          <option value="uebersetzer">🌍 Übersetzer</option>
+          <option value="kurz">⚡ Kurz &amp; knapp</option>
+        </select>
+        <button id="chatClear" class="ghost">Neu</button>
+      </div>
+      <div id="chatLog" class="log" aria-live="polite"></div>
+      <form id="chatForm" class="composer">
+        <textarea id="chatInput" rows="1" placeholder="Frag deine KI …" enterkeyhint="send"></textarea>
+        <button id="chatSend" class="send" aria-label="Senden">➤</button>
+      </form>
+    </section>
+
+    <!-- KERNEL -->
+    <section id="view-kernel" class="view" aria-label="Herr Kernel">
+      <div class="stats">
+        <span id="kLives">❤️❤️❤️</span>
+        <span>Level <b id="kLevel">1</b></span>
+        <span class="score"><b id="kScore">0</b> PTS</span>
+      </div>
+      <div id="kLog" class="log term" aria-live="polite"></div>
+      <div class="keys" id="kKeys">
+        <button>-</button><button>|</button><button>&gt;</button><button>&gt;&gt;</button><button>/</button><button>~</button><button>*</button><button>sudo </button>
+      </div>
+      <form id="kForm" class="composer term-input">
+        <span class="prompt">root@kernel:~#</span>
+        <input id="kInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Befehl">
+        <button class="send" aria-label="Prüfen">⏎</button>
+      </form>
+      <div class="row">
+        <button id="kHint" class="ghost">💡 Tipp</button>
+        <button id="kSkip" class="ghost">⏭ Weiter</button>
+        <button id="kRestart" class="ghost">↺ Neustart</button>
+      </div>
+    </section>
+
+    <!-- KAMERA -->
+    <section id="view-kamera" class="view" aria-label="Kamera">
+      <label class="drop" id="camDrop">
+        <input id="camInput" type="file" accept="image/*" capture="environment" hidden>
+        <img id="camPreview" alt="" hidden>
+        <span id="camPlaceholder">📷<br>Foto machen oder auswählen</span>
+      </label>
+      <div class="row">
+        <button id="camOcr" class="primary" disabled>🔤 Text lesen</button>
+        <button id="camWhat" class="primary" disabled>🔍 Was ist das?</button>
+      </div>
+      <textarea id="camText" class="result" rows="5" placeholder="Hier erscheint der erkannte Text – du kannst ihn bearbeiten."></textarea>
+      <div class="row wrap">
+        <button class="chip" data-cam="erklaeren">Erklären</button>
+        <button class="chip" data-cam="uebersetzen">Ins Deutsche</button>
+        <button class="chip" data-cam="englisch">Ins Englische</button>
+        <button class="chip" data-cam="zusammenfassen">Zusammenfassen</button>
+      </div>
+      <div id="camAnswer" class="answer"></div>
+    </section>
+
+    <!-- SPRACHE -->
+    <section id="view-sprache" class="view" aria-label="Sprache">
+      <button id="micBtn" class="mic" aria-label="Aufnahme starten">🎙️</button>
+      <p id="micState" class="muted center">Tippen zum Sprechen</p>
+      <textarea id="voiceText" class="result" rows="4" placeholder="Hier steht, was du gesagt hast."></textarea>
+      <div class="row wrap">
+        <button class="chip" data-voice="antworten">Antworten</button>
+        <button class="chip" data-voice="zusammenfassen">Zusammenfassen</button>
+        <button class="chip" data-voice="nachricht">Als Nachricht</button>
+        <button class="chip" data-voice="notiz">Als Notiz speichern</button>
+      </div>
+      <div id="voiceAnswer" class="answer"></div>
+      <div class="row"><button id="speakBtn" class="ghost" disabled>🔊 Vorlesen</button><button id="copyBtn" class="ghost" disabled>📋 Kopieren</button></div>
+      <h3>Notizen</h3>
+      <ul id="notes" class="notes"></ul>
+    </section>
+
+    <!-- SETUP -->
+    <section id="view-setup" class="view" aria-label="Einstellungen">
+      <h2>KI-Gehirn</h2>
+      <p class="muted">Die KI wird einmal heruntergeladen und läuft dann komplett auf deinem Handy – ohne Internet, ohne Server, niemand liest mit. Am besten im WLAN laden.</p>
+      <div id="gpuState" class="note"></div>
+      <div class="models" id="models"></div>
+      <button id="loadModel" class="primary wide">KI laden</button>
+      <div class="progress" hidden id="progWrap"><div id="progBar"></div></div>
+      <p id="progText" class="muted small"></p>
+
+      <h2>Zusatzmodule</h2>
+      <ul class="plain small muted">
+        <li>🎙️ Spracherkennung (Whisper): ca. 80 MB, lädt beim ersten Sprechen</li>
+        <li>🔤 Texterkennung (Tesseract): ca. 15 MB, lädt beim ersten Foto</li>
+        <li>🔍 Bilderkennung: ca. 250 MB, lädt bei „Was ist das?“</li>
+      </ul>
+
+      <h2>Speicher</h2>
+      <p id="storage" class="muted small">–</p>
+      <button id="wipe" class="danger wide">Alle KI-Daten löschen</button>
+
+      <h2>Installieren</h2>
+      <p class="small muted"><b>Android (Chrome):</b> Menü ⋮ → „App installieren“.<br><b>iPhone (Safari):</b> Teilen ⬆︎ → „Zum Home-Bildschirm“.</p>
+      <button id="installBtn" class="ghost wide" hidden>📲 Jetzt installieren</button>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="Bereiche">
+    <button data-goto="chat" class="on"><span>💬</span>Chat</button>
+    <button data-goto="kernel"><span>🐧</span>Kernel</button>
+    <button data-goto="kamera"><span>📷</span>Kamera</button>
+    <button data-goto="sprache"><span>🎙️</span>Sprache</button>
+    <button data-goto="setup"><span>⚙️</span>KI</button>
+  </nav>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
